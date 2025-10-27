@@ -1,0 +1,869 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<roblox xmlns:xmime="http://www.w3.org/2005/05/xmlmime" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="4">
+<Item class="Model" referent="RBX0">
+<Properties>
+<bool name="Archivable">true</bool>
+<string name="Name">Corebound</string>
+</Properties>
+<Item class="Script" referent="RBX1">
+<Properties>
+<bool name="Disabled">false</bool>
+<string name="Name">Installer</string>
+<ProtectedString name="Source"><![CDATA[
+-- Corebound Installer
+local services = {
+{"ServerScriptService", game:GetService("ServerScriptService")},
+{"ServerStorage", game:GetService("ServerStorage")},
+{"StarterPlayer", game:GetService("StarterPlayer")},
+{"ReplicatedStorage", game:GetService("ReplicatedStorage")}
+}
+
+local parentModel = script.Parent
+
+local function moveChildren(containerName, service)
+local container = parentModel:FindFirstChild(containerName)
+if not container then
+return
+end
+
+for _, child in ipairs(container:GetChildren()) do
+child.Parent = service
+end
+
+container:Destroy()
+end
+
+for _, entry in ipairs(services) do
+local sourceName, target = entry[1], entry[2]
+moveChildren(sourceName, target)
+end
+
+script:Destroy()
+]]></ProtectedString>
+</Properties>
+</Item>
+<Item class="Folder" referent="RBX2">
+<Properties>
+<string name="Name">ServerScriptService</string>
+</Properties>
+<Item class="Folder" referent="RBX3">
+<Properties>
+<string name="Name">Corebound</string>
+</Properties>
+<Item class="ModuleScript" referent="RBX4">
+<Properties>
+<string name="Name">MineConfig</string>
+<ProtectedString name="Source"><![CDATA[
+local config = {}
+
+config.BlockSize = 8
+config.LayerSize = 14 -- number of blocks along X/Z
+config.LayerDepth = 4 -- number of stacked blocks per layer
+config.RespawnTime = 15
+
+config.Layers = {
+{
+name = "Verdant Stonefield",
+description = "Starter layer with soft stone and basic ores.",
+depthRange = {0, 500},
+ambientColor = Color3.fromRGB(152, 210, 157),
+gravityModifier = 1,
+temperature = "Mild",
+oreWeights = {
+{ore = "Stone", weight = 60},
+{ore = "Iron", weight = 25},
+{ore = "Amber", weight = 10},
+{ore = "EchoCrystal", weight = 5}
+}
+},
+{
+name = "Amber Caves",
+description = "Glowing caves with brittle amber deposits.",
+depthRange = {500, 1500},
+ambientColor = Color3.fromRGB(255, 191, 111),
+gravityModifier = 1.05,
+temperature = "Warm",
+oreWeights = {
+{ore = "Stone", weight = 40},
+{ore = "Iron", weight = 20},
+{ore = "Amber", weight = 25},
+{ore = "Crytite", weight = 10},
+{ore = "EchoCrystal", weight = 5}
+}
+},
+{
+name = "Magma Hollows",
+description = "Molten caverns that demand stronger gear.",
+depthRange = {1500, 3000},
+ambientColor = Color3.fromRGB(255, 102, 102),
+gravityModifier = 1.1,
+temperature = "Hot",
+oreWeights = {
+{ore = "Stone", weight = 25},
+{ore = "Iron", weight = 25},
+{ore = "Amber", weight = 15},
+{ore = "Crytite", weight = 20},
+{ore = "Voidstone", weight = 15}
+}
+},
+{
+name = "Obsidian Abyss",
+description = "Dark reflective caverns filled with rare gems.",
+depthRange = {3000, 5000},
+ambientColor = Color3.fromRGB(54, 57, 63),
+gravityModifier = 0.95,
+temperature = "Chilly",
+oreWeights = {
+{ore = "Obsidian", weight = 35},
+{ore = "Crytite", weight = 25},
+{ore = "Voidstone", weight = 25},
+{ore = "EchoCrystal", weight = 10},
+{ore = "AncientRelic", weight = 5}
+}
+},
+{
+name = "Ancient Core",
+description = "Zero-gravity chamber of alien technology.",
+depthRange = {5000, 8000},
+ambientColor = Color3.fromRGB(155, 89, 182),
+gravityModifier = 0.6,
+temperature = "Unknown",
+oreWeights = {
+{ore = "Voidstone", weight = 35},
+{ore = "EchoCrystal", weight = 25},
+{ore = "AncientRelic", weight = 20},
+{ore = "CoreFragment", weight = 20}
+}
+}
+}
+
+return config
+]]></ProtectedString>
+</Properties>
+</Item>
+<Item class="ModuleScript" referent="RBX5">
+<Properties>
+<string name="Name">OreDefinitions</string>
+<ProtectedString name="Source"><![CDATA[
+local ores = {
+Stone = {
+displayName = "Stone",
+color = Color3.fromRGB(140, 120, 105),
+material = Enum.Material.Slate,
+hitPoints = 20,
+value = {min = 3, max = 6}
+},
+Iron = {
+displayName = "Iron",
+color = Color3.fromRGB(198, 198, 204),
+material = Enum.Material.Metal,
+hitPoints = 35,
+value = {min = 12, max = 18}
+},
+Amber = {
+displayName = "Amber",
+color = Color3.fromRGB(255, 191, 128),
+material = Enum.Material.Neon,
+hitPoints = 45,
+value = {min = 20, max = 28}
+},
+Crytite = {
+displayName = "Crytite",
+color = Color3.fromRGB(119, 221, 231),
+material = Enum.Material.Glass,
+hitPoints = 60,
+value = {min = 35, max = 48}
+},
+Voidstone = {
+displayName = "Voidstone",
+color = Color3.fromRGB(59, 31, 71),
+material = Enum.Material.Basalt,
+hitPoints = 80,
+value = {min = 55, max = 75}
+},
+Obsidian = {
+displayName = "Obsidian",
+color = Color3.fromRGB(21, 24, 30),
+material = Enum.Material.Granite,
+hitPoints = 85,
+value = {min = 48, max = 65}
+},
+EchoCrystal = {
+displayName = "Echo Crystal",
+color = Color3.fromRGB(199, 77, 255),
+material = Enum.Material.Neon,
+hitPoints = 70,
+value = {min = 65, max = 95}
+},
+AncientRelic = {
+displayName = "Ancient Relic",
+color = Color3.fromRGB(255, 223, 127),
+material = Enum.Material.ForceField,
+hitPoints = 120,
+value = {min = 110, max = 150}
+},
+CoreFragment = {
+displayName = "Core Fragment",
+color = Color3.fromRGB(255, 64, 106),
+material = Enum.Material.Neon,
+hitPoints = 150,
+value = {min = 175, max = 220}
+}
+}
+
+return ores
+]]></ProtectedString>
+</Properties>
+</Item>
+<Item class="ModuleScript" referent="RBX6">
+<Properties>
+<string name="Name">ToolStats</string>
+<ProtectedString name="Source"><![CDATA[
+return {
+StarterPickaxe = {
+power = 15,
+cooldown = 0.7,
+range = 18
+},
+AmberDrill = {
+power = 35,
+cooldown = 0.45,
+range = 22
+},
+VoidstoneLaser = {
+power = 65,
+cooldown = 0.3,
+range = 26
+}
+}
+]]></ProtectedString>
+</Properties>
+</Item>
+<Item class="ModuleScript" referent="RBX7">
+<Properties>
+<string name="Name">MineController</string>
+<ProtectedString name="Source"><![CDATA[
+local MineController = {}
+
+local config = require(script.Parent.MineConfig)
+local ores = require(script.Parent.OreDefinitions)
+
+MineController.MineFolder = nil
+MineController._playerDepth = {}
+
+local RNG = Random.new()
+
+local function chooseOre(layerConfig)
+local totalWeight = 0
+for _, entry in ipairs(layerConfig.oreWeights) do
+totalWeight += entry.weight
+end
+
+local roll = RNG:NextNumber(0, totalWeight)
+local cumulative = 0
+for _, entry in ipairs(layerConfig.oreWeights) do
+cumulative += entry.weight
+if roll <= cumulative then
+return entry.ore
+end
+end
+
+return layerConfig.oreWeights[1].ore
+end
+
+local function createBlock(self, layerIndex, gridX, gridZ, depthIndex)
+local layerConfig = config.Layers[layerIndex]
+if not layerConfig then
+return nil
+end
+
+local oreName = chooseOre(layerConfig)
+local oreDef = ores[oreName]
+if not oreDef then
+return nil
+end
+
+local part = Instance.new("Part")
+part.Size = Vector3.new(config.BlockSize, config.BlockSize, config.BlockSize)
+part.Anchored = true
+part.TopSurface = Enum.SurfaceType.Smooth
+part.BottomSurface = Enum.SurfaceType.Smooth
+part.Material = oreDef.material
+part.Color = oreDef.color
+part.Name = string.format("%s_%d_%d_%d", oreName, layerIndex, gridX, gridZ)
+
+local originOffset = (config.LayerSize * config.BlockSize) / 2
+local xPos = (gridX * config.BlockSize) - originOffset + (config.BlockSize / 2)
+local zPos = (gridZ * config.BlockSize) - originOffset + (config.BlockSize / 2)
+local yPos = -((layerIndex - 1) * config.LayerDepth + depthIndex) * config.BlockSize - (config.BlockSize / 2)
+part.CFrame = CFrame.new(xPos, yPos, zPos)
+
+part:SetAttribute("OreType", oreName)
+part:SetAttribute("HitPoints", oreDef.hitPoints)
+part:SetAttribute("MaxHitPoints", oreDef.hitPoints)
+part:SetAttribute("LayerIndex", layerIndex)
+part:SetAttribute("GridX", gridX)
+part:SetAttribute("GridZ", gridZ)
+part:SetAttribute("DepthIndex", depthIndex)
+part:SetAttribute("DepthMeters", ((layerIndex - 1) * config.LayerDepth + depthIndex) * config.BlockSize)
+
+part.Parent = self.MineFolder
+
+
+return part
+end
+
+local function respawnBlock(self, layerIndex, gridX, gridZ, depthIndex)
+task.delay(config.RespawnTime, function()
+if not self.MineFolder or not self.MineFolder.Parent then
+return
+end
+createBlock(self, layerIndex, gridX, gridZ, depthIndex)
+end)
+end
+
+function MineController:Init()
+if self.MineFolder and self.MineFolder.Parent then
+return
+end
+
+self.MineFolder = Instance.new("Folder")
+self.MineFolder.Name = "CoreboundMine"
+self.MineFolder.Parent = workspace
+
+for layerIndex = 1, #config.Layers do
+for x = 0, config.LayerSize - 1 do
+for z = 0, config.LayerSize - 1 do
+for depthIndex = 0, config.LayerDepth - 1 do
+createBlock(self, layerIndex, x, z, depthIndex)
+end
+end
+end
+end
+end
+
+local function updateTransparency(part)
+local maxHp = part:GetAttribute("MaxHitPoints") or 1
+local current = math.clamp(part:GetAttribute("HitPoints") or 0, 0, maxHp)
+local ratio = 1 - (current / maxHp)
+part.Transparency = ratio * 0.6
+end
+
+local function rewardPlayer(self, player, oreName, depthMeters)
+if not player then
+return
+end
+
+local oreDef = ores[oreName]
+if not oreDef then
+return
+end
+
+local leaderstats = player:FindFirstChild("leaderstats")
+local credits = leaderstats and leaderstats:FindFirstChild("Credits")
+local depthStat = leaderstats and leaderstats:FindFirstChild("Depth")
+
+local oreInventory = player:FindFirstChild("OreInventory")
+if not oreInventory then
+oreInventory = Instance.new("Folder")
+oreInventory.Name = "OreInventory"
+oreInventory.Parent = player
+end
+
+local oreValue = math.floor(RNG:NextNumber(oreDef.value.min, oreDef.value.max))
+
+local oreCountValue = oreInventory:FindFirstChild(oreName)
+if not oreCountValue then
+oreCountValue = Instance.new("IntValue")
+oreCountValue.Name = oreName
+oreCountValue.Parent = oreInventory
+end
+oreCountValue.Value += 1
+
+if credits then
+credits.Value += oreValue
+end
+
+if depthStat and depthMeters > (self._playerDepth[player] or 0) then
+self._playerDepth[player] = depthMeters
+depthStat.Value = math.floor(depthMeters)
+end
+end
+
+function MineController:HandleBlockHit(part, player, miningPower)
+if not part or part.Parent ~= self.MineFolder then
+return
+end
+
+local hitPoints = part:GetAttribute("HitPoints")
+if not hitPoints or hitPoints <= 0 then
+return
+end
+
+hitPoints -= miningPower
+part:SetAttribute("HitPoints", math.max(0, hitPoints))
+updateTransparency(part)
+
+if hitPoints <= 0 then
+local layerIndex = part:GetAttribute("LayerIndex") or 1
+local gridX = part:GetAttribute("GridX") or 0
+local gridZ = part:GetAttribute("GridZ") or 0
+local depthIndex = part:GetAttribute("DepthIndex") or 0
+local depthMeters = part:GetAttribute("DepthMeters") or 0
+local oreName = part:GetAttribute("OreType") or "Stone"
+
+part:Destroy()
+
+rewardPlayer(self, player, oreName, depthMeters)
+respawnBlock(self, layerIndex, gridX, gridZ, depthIndex)
+end
+end
+
+function MineController:RegisterPlayer(player)
+self._playerDepth[player] = 0
+
+local leaderstats = Instance.new("Folder")
+leaderstats.Name = "leaderstats"
+leaderstats.Parent = player
+
+local credits = Instance.new("IntValue")
+credits.Name = "Credits"
+credits.Value = 0
+credits.Parent = leaderstats
+
+local depthStat = Instance.new("IntValue")
+depthStat.Name = "Depth"
+depthStat.Value = 0
+depthStat.Parent = leaderstats
+end
+
+function MineController:UnregisterPlayer(player)
+self._playerDepth[player] = nil
+end
+
+return MineController
+]]></ProtectedString>
+</Properties>
+</Item>
+<Item class="Script" referent="RBX8">
+<Properties>
+<bool name="Disabled">false</bool>
+<string name="Name">CoreboundServer</string>
+<ProtectedString name="Source"><![CDATA[
+local Players = game:GetService("Players")
+local ServerStorage = game:GetService("ServerStorage")
+
+local mineController = require(script.Parent.MineController)
+
+mineController:Init()
+
+local function giveStarterTools(player)
+local toolsFolder = ServerStorage:FindFirstChild("CoreboundTools")
+if not toolsFolder then
+return
+end
+
+local backpack = player:FindFirstChildOfClass("Backpack") or player:FindFirstChild("Backpack")
+if not backpack then
+backpack = player:WaitForChild("Backpack", 5)
+end
+
+if not backpack then
+return
+end
+
+local character = player.Character
+
+for _, tool in ipairs(toolsFolder:GetChildren()) do
+local hasTool = backpack:FindFirstChild(tool.Name) ~= nil
+if not hasTool and character then
+hasTool = character:FindFirstChild(tool.Name) ~= nil
+end
+
+if not hasTool then
+local cloned = tool:Clone()
+cloned.Parent = backpack
+end
+end
+end
+
+Players.PlayerAdded:Connect(function(player)
+mineController:RegisterPlayer(player)
+
+player.CharacterAdded:Connect(function()
+giveStarterTools(player)
+end)
+
+if player.Character then
+	task.defer(giveStarterTools, player)
+end
+end)
+
+Players.PlayerRemoving:Connect(function(player)
+mineController:UnregisterPlayer(player)
+end)
+]]></ProtectedString>
+</Properties>
+</Item>
+</Item>
+</Item>
+<Item class="Folder" referent="RBX9">
+<Properties>
+<string name="Name">ServerStorage</string>
+</Properties>
+<Item class="Folder" referent="RBX10">
+<Properties>
+<string name="Name">CoreboundTools</string>
+</Properties>
+<Item class="Tool" referent="RBX11">
+<Properties>
+<bool name="CanBeDropped">false</bool>
+<bool name="Enabled">true</bool>
+<bool name="RequiresHandle">true</bool>
+<string name="GripForward">0 0 1</string>
+<string name="GripPos">0 0 0</string>
+<string name="GripRight">1 0 0</string>
+<string name="GripUp">0 1 0</string>
+<string name="Name">StarterPickaxe</string>
+</Properties>
+<Item class="Part" referent="RBX12">
+<Properties>
+<bool name="Anchored">false</bool>
+<bool name="CanCollide">false</bool>
+<bool name="CanTouch">true</bool>
+<bool name="CastShadow">true</bool>
+<float name="Mass">0</float>
+<string name="Material">Metal</string>
+<string name="Name">Handle</string>
+<Vector3 name="Size">0.6 4 0.6</Vector3>
+<CFrame name="CFrame">1 0 0 0 1 0 0 0 1 0 0 0</CFrame>
+<Color3 name="Color">0.803922 0.819608 0.831373</Color3>
+</Properties>
+</Item>
+<Item class="Script" referent="RBX13">
+<Properties>
+<bool name="Disabled">false</bool>
+<string name="Name">ToolServer</string>
+<ProtectedString name="Source"><![CDATA[
+local Tool = script.Parent
+local Players = game:GetService("Players")
+
+local mineController = require(game.ServerScriptService.Corebound.MineController)
+local toolStats = require(game.ServerScriptService.Corebound.ToolStats)
+
+local stats = toolStats[Tool.Name] or {
+power = 10,
+cooldown = 0.8,
+range = 14
+}
+
+local lastSwing = 0
+
+local function doSwing()
+local character = Tool.Parent
+if not character then
+return
+end
+
+local humanoidRootPart = character:FindFirstChild("HumanoidRootPart")
+local player = Players:GetPlayerFromCharacter(character)
+if not humanoidRootPart or not player then
+return
+end
+
+local now = time()
+if now - lastSwing < stats.cooldown then
+return
+end
+
+lastSwing = now
+
+local direction = humanoidRootPart.CFrame.LookVector * stats.range
+local rayParams = RaycastParams.new()
+rayParams.FilterDescendantsInstances = {character}
+rayParams.FilterType = Enum.RaycastFilterType.Blacklist
+
+local result = workspace:Raycast(humanoidRootPart.Position, direction, rayParams)
+if result and result.Instance then
+mineController:HandleBlockHit(result.Instance, player, stats.power)
+end
+end
+
+Tool.Activated:Connect(doSwing)
+]]></ProtectedString>
+</Properties>
+</Item>
+</Item>
+<Item class="Tool" referent="RBX14">
+<Properties>
+<bool name="CanBeDropped">false</bool>
+<bool name="Enabled">true</bool>
+<bool name="RequiresHandle">true</bool>
+<string name="GripForward">0 0 1</string>
+<string name="GripPos">0 0 0</string>
+<string name="GripRight">1 0 0</string>
+<string name="GripUp">0 1 0</string>
+<string name="Name">AmberDrill</string>
+</Properties>
+<Item class="Part" referent="RBX15">
+<Properties>
+<bool name="Anchored">false</bool>
+<bool name="CanCollide">false</bool>
+<bool name="CanTouch">true</bool>
+<bool name="CastShadow">true</bool>
+<float name="Mass">0</float>
+<string name="Material">Neon</string>
+<string name="Name">Handle</string>
+<Vector3 name="Size">0.8 3.2 0.8</Vector3>
+<CFrame name="CFrame">1 0 0 0 1 0 0 0 1 0 0 0</CFrame>
+<Color3 name="Color">1 0.694118 0.376471</Color3>
+</Properties>
+</Item>
+<Item class="Script" referent="RBX16">
+<Properties>
+<bool name="Disabled">false</bool>
+<string name="Name">ToolServer</string>
+<ProtectedString name="Source"><![CDATA[
+local Tool = script.Parent
+local Players = game:GetService("Players")
+
+local mineController = require(game.ServerScriptService.Corebound.MineController)
+local toolStats = require(game.ServerScriptService.Corebound.ToolStats)
+
+local stats = toolStats[Tool.Name] or {
+power = 30,
+cooldown = 0.5,
+range = 20
+}
+
+local lastSwing = 0
+
+local function doSwing()
+local character = Tool.Parent
+if not character then
+return
+end
+
+local humanoidRootPart = character:FindFirstChild("HumanoidRootPart")
+local player = Players:GetPlayerFromCharacter(character)
+if not humanoidRootPart or not player then
+return
+end
+
+local now = time()
+if now - lastSwing < stats.cooldown then
+return
+end
+
+lastSwing = now
+
+local rayParams = RaycastParams.new()
+rayParams.FilterDescendantsInstances = {character}
+rayParams.FilterType = Enum.RaycastFilterType.Blacklist
+
+local direction = humanoidRootPart.CFrame.LookVector * stats.range
+local result = workspace:Raycast(humanoidRootPart.Position, direction, rayParams)
+if result and result.Instance then
+mineController:HandleBlockHit(result.Instance, player, stats.power)
+end
+end
+
+Tool.Activated:Connect(doSwing)
+]]></ProtectedString>
+</Properties>
+</Item>
+</Item>
+</Item>
+</Item>
+<Item class="Folder" referent="RBX17">
+<Properties>
+<string name="Name">StarterPlayer</string>
+</Properties>
+<Item class="Folder" referent="RBX18">
+<Properties>
+<string name="Name">StarterPlayerScripts</string>
+</Properties>
+<Item class="LocalScript" referent="RBX19">
+<Properties>
+<bool name="Disabled">false</bool>
+<string name="Name">CoreboundHUD</string>
+<ProtectedString name="Source"><![CDATA[
+local Players = game:GetService("Players")
+
+local player = Players.LocalPlayer
+local playerGui = player:WaitForChild("PlayerGui")
+
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "CoreboundHUD"
+screenGui.ResetOnSpawn = false
+screenGui.Parent = playerGui
+
+local frame = Instance.new("Frame")
+frame.BackgroundTransparency = 0.25
+frame.BackgroundColor3 = Color3.fromRGB(18, 18, 26)
+frame.BorderSizePixel = 0
+frame.AnchorPoint = Vector2.new(0, 1)
+frame.Position = UDim2.new(0, 12, 1, -12)
+frame.Size = UDim2.new(0, 260, 0, 180)
+frame.Parent = screenGui
+
+local title = Instance.new("TextLabel")
+title.Font = Enum.Font.GothamBold
+title.Text = "COREBOUND"
+title.TextColor3 = Color3.fromRGB(255, 255, 255)
+title.TextSize = 20
+title.BackgroundTransparency = 1
+title.Position = UDim2.new(0, 12, 0, 8)
+title.Size = UDim2.new(1, -24, 0, 24)
+title.TextXAlignment = Enum.TextXAlignment.Left
+title.Parent = frame
+
+local creditsLabel = Instance.new("TextLabel")
+creditsLabel.Font = Enum.Font.GothamSemibold
+creditsLabel.Text = "Credits: 0"
+creditsLabel.TextColor3 = Color3.fromRGB(85, 255, 170)
+creditsLabel.TextSize = 18
+creditsLabel.BackgroundTransparency = 1
+creditsLabel.Position = UDim2.new(0, 12, 0, 48)
+creditsLabel.Size = UDim2.new(1, -24, 0, 22)
+creditsLabel.TextXAlignment = Enum.TextXAlignment.Left
+creditsLabel.Parent = frame
+
+local depthLabel = Instance.new("TextLabel")
+depthLabel.Font = Enum.Font.GothamSemibold
+depthLabel.Text = "Depth: 0m"
+depthLabel.TextColor3 = Color3.fromRGB(173, 216, 255)
+depthLabel.TextSize = 18
+depthLabel.BackgroundTransparency = 1
+depthLabel.Position = UDim2.new(0, 12, 0, 76)
+depthLabel.Size = UDim2.new(1, -24, 0, 22)
+depthLabel.TextXAlignment = Enum.TextXAlignment.Left
+depthLabel.Parent = frame
+
+local inventoryLabel = Instance.new("TextLabel")
+inventoryLabel.Font = Enum.Font.Gotham
+inventoryLabel.Text = "Ore Inventory"
+inventoryLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+inventoryLabel.TextSize = 16
+inventoryLabel.BackgroundTransparency = 1
+inventoryLabel.Position = UDim2.new(0, 12, 0, 108)
+inventoryLabel.Size = UDim2.new(1, -24, 0, 20)
+inventoryLabel.TextXAlignment = Enum.TextXAlignment.Left
+inventoryLabel.Parent = frame
+
+local scrollingFrame = Instance.new("ScrollingFrame")
+scrollingFrame.BackgroundTransparency = 0.35
+scrollingFrame.BackgroundColor3 = Color3.fromRGB(11, 11, 19)
+scrollingFrame.BorderSizePixel = 0
+scrollingFrame.Position = UDim2.new(0, 12, 0, 136)
+scrollingFrame.Size = UDim2.new(1, -24, 0, 40)
+scrollingFrame.CanvasSize = UDim2.new(0, 0, 0, 0)
+scrollingFrame.AutomaticCanvasSize = Enum.AutomaticSize.Y
+scrollingFrame.ScrollBarImageColor3 = Color3.fromRGB(88, 157, 255)
+scrollingFrame.Parent = frame
+
+local layout = Instance.new("UIListLayout")
+layout.FillDirection = Enum.FillDirection.Vertical
+layout.SortOrder = Enum.SortOrder.LayoutOrder
+layout.Padding = UDim.new(0, 4)
+layout.Parent = scrollingFrame
+
+local oreLabels = {}
+
+local function getOrCreateOreLabel(name)
+local label = oreLabels[name]
+if label then
+return label
+end
+
+label = Instance.new("TextLabel")
+label.Font = Enum.Font.Gotham
+label.TextColor3 = Color3.fromRGB(200, 200, 200)
+label.TextSize = 15
+label.BackgroundTransparency = 1
+label.Size = UDim2.new(1, -4, 0, 18)
+label.TextXAlignment = Enum.TextXAlignment.Left
+label.Text = string.format("%s: 0", name)
+label.Parent = scrollingFrame
+oreLabels[name] = label
+
+return label
+end
+
+local function updateOreLabel(name, amount)
+local label = getOrCreateOreLabel(name)
+label.Text = string.format("%s: %d", name, amount)
+end
+
+local function watchOreInventory(folder)
+for _, child in ipairs(folder:GetChildren()) do
+if child:IsA("IntValue") then
+updateOreLabel(child.Name, child.Value)
+child:GetPropertyChangedSignal("Value"):Connect(function()
+updateOreLabel(child.Name, child.Value)
+end)
+end
+end
+
+folder.ChildAdded:Connect(function(child)
+if child:IsA("IntValue") then
+updateOreLabel(child.Name, child.Value)
+child:GetPropertyChangedSignal("Value"):Connect(function()
+updateOreLabel(child.Name, child.Value)
+end)
+end
+end)
+end
+
+local function onLeaderstats(leaderstats)
+local credits = leaderstats:FindFirstChild("Credits")
+local depth = leaderstats:FindFirstChild("Depth")
+
+if credits then
+creditsLabel.Text = string.format("Credits: %d", credits.Value)
+credits:GetPropertyChangedSignal("Value"):Connect(function()
+creditsLabel.Text = string.format("Credits: %d", credits.Value)
+end)
+end
+
+if depth then
+depthLabel.Text = string.format("Depth: %dm", depth.Value)
+depth:GetPropertyChangedSignal("Value"):Connect(function()
+depthLabel.Text = string.format("Depth: %dm", depth.Value)
+end)
+end
+end
+
+local existingLeaderstats = player:FindFirstChild("leaderstats")
+if existingLeaderstats then
+onLeaderstats(existingLeaderstats)
+else
+player.ChildAdded:Connect(function(child)
+if child.Name == "leaderstats" then
+onLeaderstats(child)
+end
+end)
+end
+
+local oreInventory = player:FindFirstChild("OreInventory")
+if oreInventory then
+watchOreInventory(oreInventory)
+else
+player.ChildAdded:Connect(function(child)
+if child.Name == "OreInventory" then
+watchOreInventory(child)
+end
+end)
+end
+]]></ProtectedString>
+</Properties>
+</Item>
+</Item>
+</Item>
+<Item class="Folder" referent="RBX20">
+<Properties>
+<string name="Name">ReplicatedStorage</string>
+</Properties>
+</Item>
+</Item>
+</roblox>
