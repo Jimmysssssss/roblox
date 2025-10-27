@@ -27,6 +27,28 @@ Corebound is a Roblox mining adventure set on a mysterious, procedurally-generat
 - Persistent data tracking depth, equipment, bases, and guild memberships.
 - Optional first-person mode with dynamic lighting sourced from player gear.
 
+## Playable Prototype
+
+A functional prototype of Corebound is provided in [`CoreboundStarter.rbxmx`](./CoreboundStarter.rbxmx). Import the model into a Roblox Studio place to explore a simplified version of the gameplay loop:
+
+- Procedurally populates a multi-layer mine with ores that respawn after a short delay.
+- Awards credits and tracks maximum depth for each player.
+- Provides two starter tools (a pickaxe and an amber drill) with different mining speeds.
+- Automatically creates a HUD that displays credits, depth, and ore inventory counts.
+
+### How to install in Roblox Studio
+
+1. Download `CoreboundStarter.rbxmx` and import it into your place (e.g., **Model → Import**).
+2. After the model appears in the Workspace, run the experience once. The included installer script moves every asset into the appropriate service (ServerScriptService, ServerStorage, StarterPlayer, etc.) and then removes itself.
+3. Press **Play** in Studio to test. You will spawn with starter tools and can begin mining the generated cavern.
+
+### Extending the prototype
+
+- Add new tools by duplicating an existing tool inside `ServerStorage/CoreboundTools` and updating the stats in `ServerScriptService/Corebound/ToolStats`.
+- Adjust generation parameters such as block size, layer size, and ore rarity in `ServerScriptService/Corebound/MineConfig`.
+- Expand the HUD or create new UIs by editing the `CoreboundHUD` LocalScript in `StarterPlayerScripts`.
+- Introduce selling stations, quest givers, or base-building systems by building on the server scripts inside `ServerScriptService/Corebound`.
+
 ## Future Expansions
 - **Surface City** – A social hub with trading posts, mission boards, and PvP arenas.
 - **Void Layer** – A secret endgame biome beneath the core featuring distorted gravity and alien ores.
